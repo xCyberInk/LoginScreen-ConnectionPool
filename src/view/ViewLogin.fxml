@@ -22,15 +22,15 @@
          </image>
       </ImageView>
       <TextField fx:id="txtUser" layoutX="43.0" layoutY="140.0" prefHeight="26.0" prefWidth="258.0" promptText="User" />
+      <PasswordField fx:id="txtPassword" layoutX="43.0" layoutY="187.0" prefHeight="26.0" prefWidth="258.0" promptText="Password" />
       <Button fx:id="btnLogin" layoutX="134.0" layoutY="270.0" mnemonicParsing="false" onAction="#eventAction" prefHeight="30.0" prefWidth="77.0" style="-fx-background-color: black;" text="Log In" textFill="WHITE">
          <font>
             <Font size="14.0" />
          </font>
       </Button>
-      <PasswordField fx:id="txtPassword" layoutX="43.0" layoutY="187.0" prefHeight="26.0" prefWidth="258.0" promptText="Password" />
-      <Hyperlink layoutX="121.0" layoutY="309.0" text="Forgot password?" />
-      <Hyperlink layoutX="92.0" layoutY="533.0" prefHeight="39.0" prefWidth="36.0" />
-      <Hyperlink layoutX="154.0" layoutY="533.0" prefHeight="39.0" prefWidth="36.0" />
-      <Hyperlink layoutX="214.0" layoutY="533.0" prefHeight="39.0" prefWidth="36.0" />
+      <Hyperlink layoutX="121.0" layoutY="309.0" onAction="#openLinkFP" text="Without an Account?" />
+      <Hyperlink layoutX="92.0" layoutY="533.0" onAction="#OpenIG" prefHeight="39.0" prefWidth="36.0" />
+      <Hyperlink layoutX="154.0" layoutY="533.0" onAction="#OpenFB" prefHeight="39.0" prefWidth="36.0" />
+      <Hyperlink layoutX="214.0" layoutY="533.0" onAction="#OpenWA" prefHeight="39.0" prefWidth="36.0" />
    </children>
 </AnchorPane>

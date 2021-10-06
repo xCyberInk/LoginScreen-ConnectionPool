@@ -5,7 +5,10 @@
  */
 package controller;
 
+import java.awt.Desktop;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -48,7 +51,6 @@ public class FXMLLoginScreenController implements Initializable {
     @FXML
     private Button btnLogin;
     
-    @FXML
     private void eventKey(KeyEvent event){
         
         Object evt = event.getSource();
@@ -152,6 +154,24 @@ public class FXMLLoginScreenController implements Initializable {
         }
                 
     }    
+
+    @FXML
+    private void openLinkFP(ActionEvent event) throws IOException, URISyntaxException {
+        Desktop.getDesktop().browse(new URI("http://google.com"));
+    }
+
+    @FXML
+    private void OpenIG(ActionEvent event) {
+        
+    }
+
+    @FXML
+    private void OpenFB(ActionEvent event) {
+    }
+
+    @FXML
+    private void OpenWA(ActionEvent event) {
+    }
     
     
 }
