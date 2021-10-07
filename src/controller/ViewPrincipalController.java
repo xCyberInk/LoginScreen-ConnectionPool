@@ -6,6 +6,7 @@
 package controller;
 
 import ingsoftwareordenamiento.Ordenador;
+import java.awt.Component;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -24,11 +25,24 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.ScrollBar;
 import javafx.scene.control.TextArea;
 import javafx.scene.input.InputMethodEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+
+import java.net.URL;
+import java.util.ResourceBundle;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.concurrent.Task;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
 /**
@@ -37,16 +51,21 @@ import javax.swing.JOptionPane;
  * @author andres
  */
 public class ViewPrincipalController implements Initializable {
-
+    final JFileChooser fc;
     public String dir;
     @FXML
-    private TextArea txtOut;
+    private ProgressBar progressBar;
+    Task copyWorker;
     @FXML
-    private ScrollBar scrollbar;
+    private Label progresslabel;
+    Component aComponent;
+    
+    @FXML
+    private Button openButton;
 
     public ViewPrincipalController() throws IOException {
         this.dir = cargar();
-
+        this.fc = new JFileChooser();;
     }
 
     /**
@@ -59,6 +78,17 @@ public class ViewPrincipalController implements Initializable {
 
     @FXML
     private void btn_QuickSort(ActionEvent event) throws IOException {
+        progressBar.setProgress(0.0);
+        copyWorker = createWorker();
+        progressBar.progressProperty().unbind();
+        progressBar.progressProperty().bind(copyWorker.progressProperty());
+        copyWorker.messageProperty().addListener(new ChangeListener<String>() {
+            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                
+                progresslabel.setText(newValue);
+            }
+        });
+        new Thread(copyWorker).start();
 
         //TimerTask tarea = new TimerTask() {
         //@Override
@@ -134,18 +164,17 @@ public class ViewPrincipalController implements Initializable {
                 String data = Arrays.toString(toOrder);
                 fw = new FileWriter(fileSalida.getAbsoluteFile(), true);
                 pw = new PrintWriter(fw);
-                
-                
+
                 pw.write("\n" + data);
-                
+
                 pw.close();
                 fw.close();
             }
             long fin = System.nanoTime();
-            
+
             double diff = (double) (fin - inicio) * 1.0e-9;
             //System.out.println("El ordenamiento duró " + diff + " segundos");
-            JOptionPane.showMessageDialog(null, "El ordenamiento duró " + diff + " segundos");
+            //JOptionPane.showMessageDialog(null, "El ordenamiento duró " + diff + " segundos");
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -162,35 +191,604 @@ public class ViewPrincipalController implements Initializable {
         }
         //}
         //};
+    }
 
+    private Task createWorker() {
+        return new Task() {
+            @Override
+            protected Object call() throws Exception {
+                for (int i = 0; i < 10; i++) {
+                    Thread.sleep(2000);
+                    updateMessage("Tarea Compleatada : " + ((i * 10) + 10) + "%");
+                    updateProgress(i + 1, 10);
+                }
+                return true;
+            }
+        };
     }
 
     @FXML
     private void btn_Shell(ActionEvent event) {
+        progressBar.setProgress(0.0);
+        copyWorker = createWorker();
+        progressBar.progressProperty().unbind();
+        progressBar.progressProperty().bind(copyWorker.progressProperty());
+        copyWorker.messageProperty().addListener(new ChangeListener<String>() {
+            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                
+                progresslabel.setText(newValue);
+            }
+        });
+        new Thread(copyWorker).start();
+
+        //TimerTask tarea = new TimerTask() {
+        //@Override
+        //public void run() {
+        //Variables
+        ArrayList numeros = new ArrayList();
+        int[] toOrder = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        File archivo = null;
+        File fileSalida = null;
+        FileReader fr = null;
+        BufferedReader br = null;
+        Ordenador o = new Ordenador();
+        BufferedWriter bw = null;
+        PrintWriter pw = null;
+        FileWriter fw = null;
+        Timer timer = new Timer();
+        try {
+
+            // Apertura del fichero y creacion de BufferedReader para poder
+            // hacer una lectura comoda (disponer del metodo readLine()).
+            archivo = new File(this.dir);
+            if (archivo.exists()) {
+                //System.out.println("Se encontró el archivo");
+            } else {
+                //System.out.println("No se encontró el archivo");
+            }
+
+            fr = new FileReader(archivo);
+            br = new BufferedReader(fr);
+            try {
+                fileSalida = new File("C:\\Users\\andre\\Desktop\\Sort.txt");
+                if (!fileSalida.exists()) {
+                    try {
+                        fileSalida.createNewFile();
+                    } catch (IOException e) {
+
+                    }
+
+                } else {
+                    //System.out.println("Archivo Ordenado Encontrado, limpiando fichero");
+                }
+                bw = new BufferedWriter(new FileWriter(fileSalida));
+            } catch (Exception e) {
+            }
+
+            int aux;
+            // Lectura del fichero
+            String linea;
+
+            while ((linea = br.readLine()) != null) {
+                String[] demo = linea.split(" ");
+                for (int i = 0; i < demo.length; i++) {
+                    numeros.add(demo[i]);
+
+                }
+
+            }
+            long inicio = System.nanoTime();
+            //numeros.size()
+            for (int i = 0; i < 10000; i++) {
+                String x = (String) numeros.get(i);
+                int cont = 1;
+                while (cont > 0) {
+                    for (int j = 0; j < x.length(); j++) {
+                        int aux2 = Integer.parseInt(String.valueOf(x.charAt(j)));
+                        toOrder[j] = aux2;
+                    }
+                    cont = -1;
+                }
+
+                o.ordenarQuickSort(toOrder);
+
+                String data = Arrays.toString(toOrder);
+                fw = new FileWriter(fileSalida.getAbsoluteFile(), true);
+                pw = new PrintWriter(fw);
+
+                pw.write("\n" + data);
+
+                pw.close();
+                fw.close();
+            }
+            long fin = System.nanoTime();
+
+            double diff = (double) (fin - inicio) * 1.0e-9;
+            //System.out.println("El ordenamiento duró " + diff + " segundos");
+            //JOptionPane.showMessageDialog(null, "El ordenamiento duró " + diff + " segundos");
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            // En el finally cerramos el fichero, para asegurarnos
+            // que se cierra tanto si todo va bien como si salta 
+            // una excepcion.
+            try {
+                if (null != fr) {
+                    fr.close();
+                }
+            } catch (Exception e2) {
+                e2.printStackTrace();
+            }
+        }
     }
 
     @FXML
     private void btn_Seleccion(ActionEvent event) {
+        progressBar.setProgress(0.0);
+        copyWorker = createWorker();
+        progressBar.progressProperty().unbind();
+        progressBar.progressProperty().bind(copyWorker.progressProperty());
+        copyWorker.messageProperty().addListener(new ChangeListener<String>() {
+            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                
+                progresslabel.setText(newValue);
+            }
+        });
+        new Thread(copyWorker).start();
+
+        //TimerTask tarea = new TimerTask() {
+        //@Override
+        //public void run() {
+        //Variables
+        ArrayList numeros = new ArrayList();
+        int[] toOrder = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        File archivo = null;
+        File fileSalida = null;
+        FileReader fr = null;
+        BufferedReader br = null;
+        Ordenador o = new Ordenador();
+        BufferedWriter bw = null;
+        PrintWriter pw = null;
+        FileWriter fw = null;
+        Timer timer = new Timer();
+        try {
+
+            // Apertura del fichero y creacion de BufferedReader para poder
+            // hacer una lectura comoda (disponer del metodo readLine()).
+            archivo = new File(this.dir);
+            if (archivo.exists()) {
+                //System.out.println("Se encontró el archivo");
+            } else {
+                //System.out.println("No se encontró el archivo");
+            }
+
+            fr = new FileReader(archivo);
+            br = new BufferedReader(fr);
+            try {
+                fileSalida = new File("C:\\Users\\andre\\Desktop\\Sort.txt");
+                if (!fileSalida.exists()) {
+                    try {
+                        fileSalida.createNewFile();
+                    } catch (IOException e) {
+
+                    }
+
+                } else {
+                    //System.out.println("Archivo Ordenado Encontrado, limpiando fichero");
+                }
+                bw = new BufferedWriter(new FileWriter(fileSalida));
+            } catch (Exception e) {
+            }
+
+            int aux;
+            // Lectura del fichero
+            String linea;
+
+            while ((linea = br.readLine()) != null) {
+                String[] demo = linea.split(" ");
+                for (int i = 0; i < demo.length; i++) {
+                    numeros.add(demo[i]);
+
+                }
+
+            }
+            long inicio = System.nanoTime();
+            //numeros.size()
+            for (int i = 0; i < 10000; i++) {
+                String x = (String) numeros.get(i);
+                int cont = 1;
+                while (cont > 0) {
+                    for (int j = 0; j < x.length(); j++) {
+                        int aux2 = Integer.parseInt(String.valueOf(x.charAt(j)));
+                        toOrder[j] = aux2;
+                    }
+                    cont = -1;
+                }
+
+                o.ordenarQuickSort(toOrder);
+
+                String data = Arrays.toString(toOrder);
+                fw = new FileWriter(fileSalida.getAbsoluteFile(), true);
+                pw = new PrintWriter(fw);
+
+                pw.write("\n" + data);
+
+                pw.close();
+                fw.close();
+            }
+            long fin = System.nanoTime();
+
+            double diff = (double) (fin - inicio) * 1.0e-9;
+            //System.out.println("El ordenamiento duró " + diff + " segundos");
+            //JOptionPane.showMessageDialog(null, "El ordenamiento duró " + diff + " segundos");
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            // En el finally cerramos el fichero, para asegurarnos
+            // que se cierra tanto si todo va bien como si salta 
+            // una excepcion.
+            try {
+                if (null != fr) {
+                    fr.close();
+                }
+            } catch (Exception e2) {
+                e2.printStackTrace();
+            }
+        }
     }
 
     @FXML
     private void btn_BubbleSort(ActionEvent event) {
+        progressBar.setProgress(0.0);
+        copyWorker = createWorker();
+        progressBar.progressProperty().unbind();
+        progressBar.progressProperty().bind(copyWorker.progressProperty());
+        copyWorker.messageProperty().addListener(new ChangeListener<String>() {
+            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                
+                progresslabel.setText(newValue);
+            }
+        });
+        new Thread(copyWorker).start();
+
+        //TimerTask tarea = new TimerTask() {
+        //@Override
+        //public void run() {
+        //Variables
+        ArrayList numeros = new ArrayList();
+        int[] toOrder = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        File archivo = null;
+        File fileSalida = null;
+        FileReader fr = null;
+        BufferedReader br = null;
+        Ordenador o = new Ordenador();
+        BufferedWriter bw = null;
+        PrintWriter pw = null;
+        FileWriter fw = null;
+        Timer timer = new Timer();
+        try {
+
+            // Apertura del fichero y creacion de BufferedReader para poder
+            // hacer una lectura comoda (disponer del metodo readLine()).
+            archivo = new File(this.dir);
+            if (archivo.exists()) {
+                //System.out.println("Se encontró el archivo");
+            } else {
+                //System.out.println("No se encontró el archivo");
+            }
+
+            fr = new FileReader(archivo);
+            br = new BufferedReader(fr);
+            try {
+                fileSalida = new File("C:\\Users\\andre\\Desktop\\Sort.txt");
+                if (!fileSalida.exists()) {
+                    try {
+                        fileSalida.createNewFile();
+                    } catch (IOException e) {
+
+                    }
+
+                } else {
+                    //System.out.println("Archivo Ordenado Encontrado, limpiando fichero");
+                }
+                bw = new BufferedWriter(new FileWriter(fileSalida));
+            } catch (Exception e) {
+            }
+
+            int aux;
+            // Lectura del fichero
+            String linea;
+
+            while ((linea = br.readLine()) != null) {
+                String[] demo = linea.split(" ");
+                for (int i = 0; i < demo.length; i++) {
+                    numeros.add(demo[i]);
+
+                }
+
+            }
+            long inicio = System.nanoTime();
+            //numeros.size()
+            for (int i = 0; i < 10000; i++) {
+                String x = (String) numeros.get(i);
+                int cont = 1;
+                while (cont > 0) {
+                    for (int j = 0; j < x.length(); j++) {
+                        int aux2 = Integer.parseInt(String.valueOf(x.charAt(j)));
+                        toOrder[j] = aux2;
+                    }
+                    cont = -1;
+                }
+
+                o.ordenarQuickSort(toOrder);
+
+                String data = Arrays.toString(toOrder);
+                fw = new FileWriter(fileSalida.getAbsoluteFile(), true);
+                pw = new PrintWriter(fw);
+
+                pw.write("\n" + data);
+
+                pw.close();
+                fw.close();
+            }
+            long fin = System.nanoTime();
+
+            double diff = (double) (fin - inicio) * 1.0e-9;
+            //System.out.println("El ordenamiento duró " + diff + " segundos");
+            //JOptionPane.showMessageDialog(null, "El ordenamiento duró " + diff + " segundos");
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            // En el finally cerramos el fichero, para asegurarnos
+            // que se cierra tanto si todo va bien como si salta 
+            // una excepcion.
+            try {
+                if (null != fr) {
+                    fr.close();
+                }
+            } catch (Exception e2) {
+                e2.printStackTrace();
+            }
+        }
     }
 
     @FXML
     private void btn_Insercion(ActionEvent event) {
+        progressBar.setProgress(0.0);
+        copyWorker = createWorker();
+        progressBar.progressProperty().unbind();
+        progressBar.progressProperty().bind(copyWorker.progressProperty());
+        copyWorker.messageProperty().addListener(new ChangeListener<String>() {
+            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                
+                progresslabel.setText(newValue);
+            }
+        });
+        new Thread(copyWorker).start();
+
+        //TimerTask tarea = new TimerTask() {
+        //@Override
+        //public void run() {
+        //Variables
+        ArrayList numeros = new ArrayList();
+        int[] toOrder = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        File archivo = null;
+        File fileSalida = null;
+        FileReader fr = null;
+        BufferedReader br = null;
+        Ordenador o = new Ordenador();
+        BufferedWriter bw = null;
+        PrintWriter pw = null;
+        FileWriter fw = null;
+        Timer timer = new Timer();
+        try {
+
+            // Apertura del fichero y creacion de BufferedReader para poder
+            // hacer una lectura comoda (disponer del metodo readLine()).
+            archivo = new File(this.dir);
+            if (archivo.exists()) {
+                //System.out.println("Se encontró el archivo");
+            } else {
+                //System.out.println("No se encontró el archivo");
+            }
+
+            fr = new FileReader(archivo);
+            br = new BufferedReader(fr);
+            try {
+                fileSalida = new File("C:\\Users\\andre\\Desktop\\Sort.txt");
+                if (!fileSalida.exists()) {
+                    try {
+                        fileSalida.createNewFile();
+                    } catch (IOException e) {
+
+                    }
+
+                } else {
+                    //System.out.println("Archivo Ordenado Encontrado, limpiando fichero");
+                }
+                bw = new BufferedWriter(new FileWriter(fileSalida));
+            } catch (Exception e) {
+            }
+
+            int aux;
+            // Lectura del fichero
+            String linea;
+
+            while ((linea = br.readLine()) != null) {
+                String[] demo = linea.split(" ");
+                for (int i = 0; i < demo.length; i++) {
+                    numeros.add(demo[i]);
+
+                }
+
+            }
+            long inicio = System.nanoTime();
+            //numeros.size()
+            for (int i = 0; i < 10000; i++) {
+                String x = (String) numeros.get(i);
+                int cont = 1;
+                while (cont > 0) {
+                    for (int j = 0; j < x.length(); j++) {
+                        int aux2 = Integer.parseInt(String.valueOf(x.charAt(j)));
+                        toOrder[j] = aux2;
+                    }
+                    cont = -1;
+                }
+
+                o.ordenarQuickSort(toOrder);
+
+                String data = Arrays.toString(toOrder);
+                fw = new FileWriter(fileSalida.getAbsoluteFile(), true);
+                pw = new PrintWriter(fw);
+
+                pw.write("\n" + data);
+
+                pw.close();
+                fw.close();
+            }
+            long fin = System.nanoTime();
+
+            double diff = (double) (fin - inicio) * 1.0e-9;
+            //System.out.println("El ordenamiento duró " + diff + " segundos");
+            //JOptionPane.showMessageDialog(null, "El ordenamiento duró " + diff + " segundos");
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            // En el finally cerramos el fichero, para asegurarnos
+            // que se cierra tanto si todo va bien como si salta 
+            // una excepcion.
+            try {
+                if (null != fr) {
+                    fr.close();
+                }
+            } catch (Exception e2) {
+                e2.printStackTrace();
+            }
+        }
     }
 
     @FXML
     private void btn_Fusion(ActionEvent event) {
+        progressBar.setProgress(0.0);
+        copyWorker = createWorker();
+        progressBar.progressProperty().unbind();
+        progressBar.progressProperty().bind(copyWorker.progressProperty());
+        copyWorker.messageProperty().addListener(new ChangeListener<String>() {
+            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                
+                progresslabel.setText(newValue);
+            }
+        });
+        new Thread(copyWorker).start();
+
+        //TimerTask tarea = new TimerTask() {
+        //@Override
+        //public void run() {
+        //Variables
+        ArrayList numeros = new ArrayList();
+        int[] toOrder = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        File archivo = null;
+        File fileSalida = null;
+        FileReader fr = null;
+        BufferedReader br = null;
+        Ordenador o = new Ordenador();
+        BufferedWriter bw = null;
+        PrintWriter pw = null;
+        FileWriter fw = null;
+        Timer timer = new Timer();
+        try {
+
+            // Apertura del fichero y creacion de BufferedReader para poder
+            // hacer una lectura comoda (disponer del metodo readLine()).
+            archivo = new File(this.dir);
+            if (archivo.exists()) {
+                //System.out.println("Se encontró el archivo");
+            } else {
+                //System.out.println("No se encontró el archivo");
+            }
+
+            fr = new FileReader(archivo);
+            br = new BufferedReader(fr);
+            try {
+                fileSalida = new File("C:\\Users\\andre\\Desktop\\Sort.txt");
+                if (!fileSalida.exists()) {
+                    try {
+                        fileSalida.createNewFile();
+                    } catch (IOException e) {
+
+                    }
+
+                } else {
+                    //System.out.println("Archivo Ordenado Encontrado, limpiando fichero");
+                }
+                bw = new BufferedWriter(new FileWriter(fileSalida));
+            } catch (Exception e) {
+            }
+
+            int aux;
+            // Lectura del fichero
+            String linea;
+
+            while ((linea = br.readLine()) != null) {
+                String[] demo = linea.split(" ");
+                for (int i = 0; i < demo.length; i++) {
+                    numeros.add(demo[i]);
+
+                }
+
+            }
+            long inicio = System.nanoTime();
+            //numeros.size()
+            for (int i = 0; i < 20000; i++) {
+                String x = (String) numeros.get(i);
+                int cont = 1;
+                while (cont > 0) {
+                    for (int j = 0; j < x.length(); j++) {
+                        int aux2 = Integer.parseInt(String.valueOf(x.charAt(j)));
+                        toOrder[j] = aux2;
+                    }
+                    cont = -1;
+                }
+
+                o.ordenarQuickSort(toOrder);
+
+                String data = Arrays.toString(toOrder);
+                fw = new FileWriter(fileSalida.getAbsoluteFile(), true);
+                pw = new PrintWriter(fw);
+
+                pw.write("\n" + data);
+
+                pw.close();
+                fw.close();
+            }
+            long fin = System.nanoTime();
+
+            double diff = (double) (fin - inicio) * 1.0e-9;
+            //System.out.println("El ordenamiento duró " + diff + " segundos");
+            //JOptionPane.showMessageDialog(null, "El ordenamiento duró " + diff + " segundos");
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            // En el finally cerramos el fichero, para asegurarnos
+            // que se cierra tanto si todo va bien como si salta 
+            // una excepcion.
+            try {
+                if (null != fr) {
+                    fr.close();
+                }
+            } catch (Exception e2) {
+                e2.printStackTrace();
+            }
+        }
     }
 
     public String cargar() throws FileNotFoundException, IOException {
-
+        
         String dir;
         File archivo = null;
         FileReader fr = null;
         BufferedReader br = null;
+        
         dir = JOptionPane.showInputDialog(null, "Paste directory", "Direccion del archivo", 3);
         archivo = new File(dir);
         boolean exists = false;
@@ -198,18 +796,24 @@ public class ViewPrincipalController implements Initializable {
             JOptionPane.showMessageDialog(null, "La ruta especificada no contiene ningún archivo");
             while (exists != true) {
                 dir = JOptionPane.showInputDialog(null, "Paste directory", "Direccion del archivo", 3);
-                if (archivo.exists()){
+                if (archivo.exists()) {
                     exists = true;
-                }else{
+                } else {
                     JOptionPane.showMessageDialog(null, "La ruta especificada no contiene ningún archivo");
                 }
-                
+
             }
-            
+
         }
         JOptionPane.showMessageDialog(null, "Dirección del archivo: " + dir);
 
         return dir;
     }
+   
 
+    @FXML
+    private void openButton(ActionEvent event) {
+        
+    }
+    
 }

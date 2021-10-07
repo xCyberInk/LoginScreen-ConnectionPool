@@ -14,6 +14,11 @@
             <Image url="@../resources/the-sun-minimalism-japan-sword-warrior-hd-wallpaper-preview.jpg.png" />
          </image>
       </ImageView>
+      <ImageView fitHeight="38.0" fitWidth="118.0" layoutX="395.0" layoutY="191.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../../../../NetBeansProjects/IngSoftwareOrdenamiento/src/resources/cargar.png" />
+         </image>
+      </ImageView>
       <ImageView fitHeight="39.0" fitWidth="94.0" layoutX="57.0" layoutY="94.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@../resources/Incersión.png" />
@@ -47,9 +52,11 @@
       <Button blendMode="LIGHTEN" layoutX="43.0" layoutY="281.0" mnemonicParsing="false" onAction="#btn_QuickSort" prefHeight="39.0" prefWidth="118.0" style="-fx-background-color: grey;" />
       <Button blendMode="LIGHTEN" layoutX="43.0" layoutY="235.0" mnemonicParsing="false" onAction="#btn_Shell" prefHeight="39.0" prefWidth="118.0" style="-fx-background-color: grey;" />
       <Button blendMode="LIGHTEN" layoutX="43.0" layoutY="140.0" mnemonicParsing="false" onAction="#btn_Seleccion" prefHeight="39.0" prefWidth="118.0" style="-fx-background-color: grey;" />
+      <Button fx:id="openButton" blendMode="LIGHTEN" layoutX="395.0" layoutY="187.0" mnemonicParsing="false" onAction="#openButton" prefHeight="39.0" prefWidth="118.0" style="-fx-background-color: grey;" />
       <Button blendMode="LIGHTEN" layoutX="43.0" layoutY="187.0" mnemonicParsing="false" onAction="#btn_BubbleSort" prefHeight="39.0" prefWidth="118.0" style="-fx-background-color: grey;" />
       <Button blendMode="LIGHTEN" layoutX="43.0" layoutY="92.0" mnemonicParsing="false" onAction="#btn_Insercion" prefHeight="39.0" prefWidth="118.0" style="-fx-background-color: grey;" />
       <Button blendMode="LIGHTEN" layoutX="43.0" layoutY="327.0" mnemonicParsing="false" onAction="#btn_Fusion" prefHeight="39.0" prefWidth="118.0" style="-fx-background-color: grey;" />
-      <AnchorPane layoutX="366.0" layoutY="88.0" prefHeight="273.0" prefWidth="212.0" />
+      <ProgressBar fx:id="progressBar" layoutX="355.0" layoutY="265.0" prefWidth="200.0" progress="0.0" />
+      <Label fx:id="progresslabel" layoutX="337.0" layoutY="301.0" prefHeight="17.0" prefWidth="237.0" />
    </children>
 </AnchorPane>
