@@ -41,9 +41,12 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.control.ProgressBar;
+import javafx.stage.FileChooser;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  * FXML Controller class
@@ -51,7 +54,8 @@ import javax.swing.JOptionPane;
  * @author andres
  */
 public class ViewPrincipalController implements Initializable {
-    final JFileChooser fc;
+
+    final FileChooser fc;
     public String dir;
     @FXML
     private ProgressBar progressBar;
@@ -59,140 +63,30 @@ public class ViewPrincipalController implements Initializable {
     @FXML
     private Label progresslabel;
     Component aComponent;
-    
-    @FXML
-    private Button openButton;
 
+    @FXML
+    private ListView listview;
+    @FXML
+    private Label tiempo;
+    @FXML
+    private ListView outputField;
     public ViewPrincipalController() throws IOException {
-        this.dir = cargar();
-        this.fc = new JFileChooser();;
+        
+        //this.dir = cargar();
+        this.fc = new FileChooser();
+        
     }
+    
 
     /**
      * Initializes the controller class.
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // TODO
     }
 
-    @FXML
-    private void btn_QuickSort(ActionEvent event) throws IOException {
-        progressBar.setProgress(0.0);
-        copyWorker = createWorker();
-        progressBar.progressProperty().unbind();
-        progressBar.progressProperty().bind(copyWorker.progressProperty());
-        copyWorker.messageProperty().addListener(new ChangeListener<String>() {
-            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-                
-                progresslabel.setText(newValue);
-            }
-        });
-        new Thread(copyWorker).start();
-
-        //TimerTask tarea = new TimerTask() {
-        //@Override
-        //public void run() {
-        //Variables
-        ArrayList numeros = new ArrayList();
-        int[] toOrder = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-        File archivo = null;
-        File fileSalida = null;
-        FileReader fr = null;
-        BufferedReader br = null;
-        Ordenador o = new Ordenador();
-        BufferedWriter bw = null;
-        PrintWriter pw = null;
-        FileWriter fw = null;
-        Timer timer = new Timer();
-        try {
-
-            // Apertura del fichero y creacion de BufferedReader para poder
-            // hacer una lectura comoda (disponer del metodo readLine()).
-            archivo = new File(this.dir);
-            if (archivo.exists()) {
-                //System.out.println("Se encontró el archivo");
-            } else {
-                //System.out.println("No se encontró el archivo");
-            }
-
-            fr = new FileReader(archivo);
-            br = new BufferedReader(fr);
-            try {
-                fileSalida = new File("C:\\Users\\andre\\Desktop\\Sort.txt");
-                if (!fileSalida.exists()) {
-                    try {
-                        fileSalida.createNewFile();
-                    } catch (IOException e) {
-
-                    }
-
-                } else {
-                    //System.out.println("Archivo Ordenado Encontrado, limpiando fichero");
-                }
-                bw = new BufferedWriter(new FileWriter(fileSalida));
-            } catch (Exception e) {
-            }
-
-            int aux;
-            // Lectura del fichero
-            String linea;
-
-            while ((linea = br.readLine()) != null) {
-                String[] demo = linea.split(" ");
-                for (int i = 0; i < demo.length; i++) {
-                    numeros.add(demo[i]);
-
-                }
-
-            }
-            long inicio = System.nanoTime();
-            //numeros.size()
-            for (int i = 0; i < 10000; i++) {
-                String x = (String) numeros.get(i);
-                int cont = 1;
-                while (cont > 0) {
-                    for (int j = 0; j < x.length(); j++) {
-                        int aux2 = Integer.parseInt(String.valueOf(x.charAt(j)));
-                        toOrder[j] = aux2;
-                    }
-                    cont = -1;
-                }
-
-                o.ordenarQuickSort(toOrder);
-
-                String data = Arrays.toString(toOrder);
-                fw = new FileWriter(fileSalida.getAbsoluteFile(), true);
-                pw = new PrintWriter(fw);
-
-                pw.write("\n" + data);
-
-                pw.close();
-                fw.close();
-            }
-            long fin = System.nanoTime();
-
-            double diff = (double) (fin - inicio) * 1.0e-9;
-            //System.out.println("El ordenamiento duró " + diff + " segundos");
-            //JOptionPane.showMessageDialog(null, "El ordenamiento duró " + diff + " segundos");
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            // En el finally cerramos el fichero, para asegurarnos
-            // que se cierra tanto si todo va bien como si salta 
-            // una excepcion.
-            try {
-                if (null != fr) {
-                    fr.close();
-                }
-            } catch (Exception e2) {
-                e2.printStackTrace();
-            }
-        }
-        //}
-        //};
-    }
-
+    
+ 
     private Task createWorker() {
         return new Task() {
             @Override
@@ -206,25 +100,20 @@ public class ViewPrincipalController implements Initializable {
             }
         };
     }
-
-    @FXML
-    private void btn_Shell(ActionEvent event) {
+    public void progressbar(){
         progressBar.setProgress(0.0);
         copyWorker = createWorker();
         progressBar.progressProperty().unbind();
         progressBar.progressProperty().bind(copyWorker.progressProperty());
         copyWorker.messageProperty().addListener(new ChangeListener<String>() {
             public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-                
+
                 progresslabel.setText(newValue);
             }
         });
         new Thread(copyWorker).start();
-
-        //TimerTask tarea = new TimerTask() {
-        //@Override
-        //public void run() {
-        //Variables
+    }
+    public void ordenar() throws FileNotFoundException, IOException{
         ArrayList numeros = new ArrayList();
         int[] toOrder = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
         File archivo = null;
@@ -235,22 +124,15 @@ public class ViewPrincipalController implements Initializable {
         BufferedWriter bw = null;
         PrintWriter pw = null;
         FileWriter fw = null;
-        Timer timer = new Timer();
         try {
-
             // Apertura del fichero y creacion de BufferedReader para poder
             // hacer una lectura comoda (disponer del metodo readLine()).
-            archivo = new File(this.dir);
-            if (archivo.exists()) {
-                //System.out.println("Se encontró el archivo");
-            } else {
-                //System.out.println("No se encontró el archivo");
-            }
-
+            archivo = new File(dir);
             fr = new FileReader(archivo);
             br = new BufferedReader(fr);
             try {
-                fileSalida = new File("C:\\Users\\andre\\Desktop\\Sort.txt");
+                fileSalida = new File(System.getProperty("user.home") + "/desktop/Sort.txt");
+                
                 if (!fileSalida.exists()) {
                     try {
                         fileSalida.createNewFile();
@@ -265,7 +147,7 @@ public class ViewPrincipalController implements Initializable {
             } catch (Exception e) {
             }
 
-            int aux;
+            
             // Lectura del fichero
             String linea;
 
@@ -273,7 +155,7 @@ public class ViewPrincipalController implements Initializable {
                 String[] demo = linea.split(" ");
                 for (int i = 0; i < demo.length; i++) {
                     numeros.add(demo[i]);
-
+                    listview.getItems().add(demo[i]);
                 }
 
             }
@@ -295,6 +177,7 @@ public class ViewPrincipalController implements Initializable {
                 String data = Arrays.toString(toOrder);
                 fw = new FileWriter(fileSalida.getAbsoluteFile(), true);
                 pw = new PrintWriter(fw);
+                outputField.getItems().add(data);
 
                 pw.write("\n" + data);
 
@@ -306,9 +189,10 @@ public class ViewPrincipalController implements Initializable {
             double diff = (double) (fin - inicio) * 1.0e-9;
             //System.out.println("El ordenamiento duró " + diff + " segundos");
             //JOptionPane.showMessageDialog(null, "El ordenamiento duró " + diff + " segundos");
+            tiempo.setText("Tiempo: "+diff+" segundos");
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
+        }finally {
             // En el finally cerramos el fichero, para asegurarnos
             // que se cierra tanto si todo va bien como si salta 
             // una excepcion.
@@ -320,500 +204,75 @@ public class ViewPrincipalController implements Initializable {
                 e2.printStackTrace();
             }
         }
+        
     }
-
     @FXML
-    private void btn_Seleccion(ActionEvent event) {
+    private void btn_Shell(ActionEvent event) throws IOException {
         progressBar.setProgress(0.0);
-        copyWorker = createWorker();
-        progressBar.progressProperty().unbind();
-        progressBar.progressProperty().bind(copyWorker.progressProperty());
-        copyWorker.messageProperty().addListener(new ChangeListener<String>() {
-            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-                
-                progresslabel.setText(newValue);
-            }
-        });
-        new Thread(copyWorker).start();
-
-        //TimerTask tarea = new TimerTask() {
-        //@Override
-        //public void run() {
-        //Variables
-        ArrayList numeros = new ArrayList();
-        int[] toOrder = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-        File archivo = null;
-        File fileSalida = null;
-        FileReader fr = null;
-        BufferedReader br = null;
-        Ordenador o = new Ordenador();
-        BufferedWriter bw = null;
-        PrintWriter pw = null;
-        FileWriter fw = null;
-        Timer timer = new Timer();
-        try {
-
-            // Apertura del fichero y creacion de BufferedReader para poder
-            // hacer una lectura comoda (disponer del metodo readLine()).
-            archivo = new File(this.dir);
-            if (archivo.exists()) {
-                //System.out.println("Se encontró el archivo");
-            } else {
-                //System.out.println("No se encontró el archivo");
-            }
-
-            fr = new FileReader(archivo);
-            br = new BufferedReader(fr);
-            try {
-                fileSalida = new File("C:\\Users\\andre\\Desktop\\Sort.txt");
-                if (!fileSalida.exists()) {
-                    try {
-                        fileSalida.createNewFile();
-                    } catch (IOException e) {
-
-                    }
-
-                } else {
-                    //System.out.println("Archivo Ordenado Encontrado, limpiando fichero");
-                }
-                bw = new BufferedWriter(new FileWriter(fileSalida));
-            } catch (Exception e) {
-            }
-
-            int aux;
-            // Lectura del fichero
-            String linea;
-
-            while ((linea = br.readLine()) != null) {
-                String[] demo = linea.split(" ");
-                for (int i = 0; i < demo.length; i++) {
-                    numeros.add(demo[i]);
-
-                }
-
-            }
-            long inicio = System.nanoTime();
-            //numeros.size()
-            for (int i = 0; i < 10000; i++) {
-                String x = (String) numeros.get(i);
-                int cont = 1;
-                while (cont > 0) {
-                    for (int j = 0; j < x.length(); j++) {
-                        int aux2 = Integer.parseInt(String.valueOf(x.charAt(j)));
-                        toOrder[j] = aux2;
-                    }
-                    cont = -1;
-                }
-
-                o.ordenarQuickSort(toOrder);
-
-                String data = Arrays.toString(toOrder);
-                fw = new FileWriter(fileSalida.getAbsoluteFile(), true);
-                pw = new PrintWriter(fw);
-
-                pw.write("\n" + data);
-
-                pw.close();
-                fw.close();
-            }
-            long fin = System.nanoTime();
-
-            double diff = (double) (fin - inicio) * 1.0e-9;
-            //System.out.println("El ordenamiento duró " + diff + " segundos");
-            //JOptionPane.showMessageDialog(null, "El ordenamiento duró " + diff + " segundos");
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            // En el finally cerramos el fichero, para asegurarnos
-            // que se cierra tanto si todo va bien como si salta 
-            // una excepcion.
-            try {
-                if (null != fr) {
-                    fr.close();
-                }
-            } catch (Exception e2) {
-                e2.printStackTrace();
-            }
-        }
+        progressbar();
+        dir = cargar();
+        ordenar();
     }
 
-    @FXML
-    private void btn_BubbleSort(ActionEvent event) {
-        progressBar.setProgress(0.0);
-        copyWorker = createWorker();
-        progressBar.progressProperty().unbind();
-        progressBar.progressProperty().bind(copyWorker.progressProperty());
-        copyWorker.messageProperty().addListener(new ChangeListener<String>() {
-            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-                
-                progresslabel.setText(newValue);
-            }
-        });
-        new Thread(copyWorker).start();
-
-        //TimerTask tarea = new TimerTask() {
-        //@Override
-        //public void run() {
-        //Variables
-        ArrayList numeros = new ArrayList();
-        int[] toOrder = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-        File archivo = null;
-        File fileSalida = null;
-        FileReader fr = null;
-        BufferedReader br = null;
-        Ordenador o = new Ordenador();
-        BufferedWriter bw = null;
-        PrintWriter pw = null;
-        FileWriter fw = null;
-        Timer timer = new Timer();
-        try {
-
-            // Apertura del fichero y creacion de BufferedReader para poder
-            // hacer una lectura comoda (disponer del metodo readLine()).
-            archivo = new File(this.dir);
-            if (archivo.exists()) {
-                //System.out.println("Se encontró el archivo");
-            } else {
-                //System.out.println("No se encontró el archivo");
-            }
-
-            fr = new FileReader(archivo);
-            br = new BufferedReader(fr);
-            try {
-                fileSalida = new File("C:\\Users\\andre\\Desktop\\Sort.txt");
-                if (!fileSalida.exists()) {
-                    try {
-                        fileSalida.createNewFile();
-                    } catch (IOException e) {
-
-                    }
-
-                } else {
-                    //System.out.println("Archivo Ordenado Encontrado, limpiando fichero");
-                }
-                bw = new BufferedWriter(new FileWriter(fileSalida));
-            } catch (Exception e) {
-            }
-
-            int aux;
-            // Lectura del fichero
-            String linea;
-
-            while ((linea = br.readLine()) != null) {
-                String[] demo = linea.split(" ");
-                for (int i = 0; i < demo.length; i++) {
-                    numeros.add(demo[i]);
-
-                }
-
-            }
-            long inicio = System.nanoTime();
-            //numeros.size()
-            for (int i = 0; i < 10000; i++) {
-                String x = (String) numeros.get(i);
-                int cont = 1;
-                while (cont > 0) {
-                    for (int j = 0; j < x.length(); j++) {
-                        int aux2 = Integer.parseInt(String.valueOf(x.charAt(j)));
-                        toOrder[j] = aux2;
-                    }
-                    cont = -1;
-                }
-
-                o.ordenarQuickSort(toOrder);
-
-                String data = Arrays.toString(toOrder);
-                fw = new FileWriter(fileSalida.getAbsoluteFile(), true);
-                pw = new PrintWriter(fw);
-
-                pw.write("\n" + data);
-
-                pw.close();
-                fw.close();
-            }
-            long fin = System.nanoTime();
-
-            double diff = (double) (fin - inicio) * 1.0e-9;
-            //System.out.println("El ordenamiento duró " + diff + " segundos");
-            //JOptionPane.showMessageDialog(null, "El ordenamiento duró " + diff + " segundos");
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            // En el finally cerramos el fichero, para asegurarnos
-            // que se cierra tanto si todo va bien como si salta 
-            // una excepcion.
-            try {
-                if (null != fr) {
-                    fr.close();
-                }
-            } catch (Exception e2) {
-                e2.printStackTrace();
-            }
-        }
-    }
-
-    @FXML
-    private void btn_Insercion(ActionEvent event) {
-        progressBar.setProgress(0.0);
-        copyWorker = createWorker();
-        progressBar.progressProperty().unbind();
-        progressBar.progressProperty().bind(copyWorker.progressProperty());
-        copyWorker.messageProperty().addListener(new ChangeListener<String>() {
-            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-                
-                progresslabel.setText(newValue);
-            }
-        });
-        new Thread(copyWorker).start();
-
-        //TimerTask tarea = new TimerTask() {
-        //@Override
-        //public void run() {
-        //Variables
-        ArrayList numeros = new ArrayList();
-        int[] toOrder = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-        File archivo = null;
-        File fileSalida = null;
-        FileReader fr = null;
-        BufferedReader br = null;
-        Ordenador o = new Ordenador();
-        BufferedWriter bw = null;
-        PrintWriter pw = null;
-        FileWriter fw = null;
-        Timer timer = new Timer();
-        try {
-
-            // Apertura del fichero y creacion de BufferedReader para poder
-            // hacer una lectura comoda (disponer del metodo readLine()).
-            archivo = new File(this.dir);
-            if (archivo.exists()) {
-                //System.out.println("Se encontró el archivo");
-            } else {
-                //System.out.println("No se encontró el archivo");
-            }
-
-            fr = new FileReader(archivo);
-            br = new BufferedReader(fr);
-            try {
-                fileSalida = new File("C:\\Users\\andre\\Desktop\\Sort.txt");
-                if (!fileSalida.exists()) {
-                    try {
-                        fileSalida.createNewFile();
-                    } catch (IOException e) {
-
-                    }
-
-                } else {
-                    //System.out.println("Archivo Ordenado Encontrado, limpiando fichero");
-                }
-                bw = new BufferedWriter(new FileWriter(fileSalida));
-            } catch (Exception e) {
-            }
-
-            int aux;
-            // Lectura del fichero
-            String linea;
-
-            while ((linea = br.readLine()) != null) {
-                String[] demo = linea.split(" ");
-                for (int i = 0; i < demo.length; i++) {
-                    numeros.add(demo[i]);
-
-                }
-
-            }
-            long inicio = System.nanoTime();
-            //numeros.size()
-            for (int i = 0; i < 10000; i++) {
-                String x = (String) numeros.get(i);
-                int cont = 1;
-                while (cont > 0) {
-                    for (int j = 0; j < x.length(); j++) {
-                        int aux2 = Integer.parseInt(String.valueOf(x.charAt(j)));
-                        toOrder[j] = aux2;
-                    }
-                    cont = -1;
-                }
-
-                o.ordenarQuickSort(toOrder);
-
-                String data = Arrays.toString(toOrder);
-                fw = new FileWriter(fileSalida.getAbsoluteFile(), true);
-                pw = new PrintWriter(fw);
-
-                pw.write("\n" + data);
-
-                pw.close();
-                fw.close();
-            }
-            long fin = System.nanoTime();
-
-            double diff = (double) (fin - inicio) * 1.0e-9;
-            //System.out.println("El ordenamiento duró " + diff + " segundos");
-            //JOptionPane.showMessageDialog(null, "El ordenamiento duró " + diff + " segundos");
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            // En el finally cerramos el fichero, para asegurarnos
-            // que se cierra tanto si todo va bien como si salta 
-            // una excepcion.
-            try {
-                if (null != fr) {
-                    fr.close();
-                }
-            } catch (Exception e2) {
-                e2.printStackTrace();
-            }
-        }
-    }
-
-    @FXML
-    private void btn_Fusion(ActionEvent event) {
-        progressBar.setProgress(0.0);
-        copyWorker = createWorker();
-        progressBar.progressProperty().unbind();
-        progressBar.progressProperty().bind(copyWorker.progressProperty());
-        copyWorker.messageProperty().addListener(new ChangeListener<String>() {
-            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-                
-                progresslabel.setText(newValue);
-            }
-        });
-        new Thread(copyWorker).start();
-
-        //TimerTask tarea = new TimerTask() {
-        //@Override
-        //public void run() {
-        //Variables
-        ArrayList numeros = new ArrayList();
-        int[] toOrder = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-        File archivo = null;
-        File fileSalida = null;
-        FileReader fr = null;
-        BufferedReader br = null;
-        Ordenador o = new Ordenador();
-        BufferedWriter bw = null;
-        PrintWriter pw = null;
-        FileWriter fw = null;
-        Timer timer = new Timer();
-        try {
-
-            // Apertura del fichero y creacion de BufferedReader para poder
-            // hacer una lectura comoda (disponer del metodo readLine()).
-            archivo = new File(this.dir);
-            if (archivo.exists()) {
-                //System.out.println("Se encontró el archivo");
-            } else {
-                //System.out.println("No se encontró el archivo");
-            }
-
-            fr = new FileReader(archivo);
-            br = new BufferedReader(fr);
-            try {
-                fileSalida = new File("C:\\Users\\andre\\Desktop\\Sort.txt");
-                if (!fileSalida.exists()) {
-                    try {
-                        fileSalida.createNewFile();
-                    } catch (IOException e) {
-
-                    }
-
-                } else {
-                    //System.out.println("Archivo Ordenado Encontrado, limpiando fichero");
-                }
-                bw = new BufferedWriter(new FileWriter(fileSalida));
-            } catch (Exception e) {
-            }
-
-            int aux;
-            // Lectura del fichero
-            String linea;
-
-            while ((linea = br.readLine()) != null) {
-                String[] demo = linea.split(" ");
-                for (int i = 0; i < demo.length; i++) {
-                    numeros.add(demo[i]);
-
-                }
-
-            }
-            long inicio = System.nanoTime();
-            //numeros.size()
-            for (int i = 0; i < 20000; i++) {
-                String x = (String) numeros.get(i);
-                int cont = 1;
-                while (cont > 0) {
-                    for (int j = 0; j < x.length(); j++) {
-                        int aux2 = Integer.parseInt(String.valueOf(x.charAt(j)));
-                        toOrder[j] = aux2;
-                    }
-                    cont = -1;
-                }
-
-                o.ordenarQuickSort(toOrder);
-
-                String data = Arrays.toString(toOrder);
-                fw = new FileWriter(fileSalida.getAbsoluteFile(), true);
-                pw = new PrintWriter(fw);
-
-                pw.write("\n" + data);
-
-                pw.close();
-                fw.close();
-            }
-            long fin = System.nanoTime();
-
-            double diff = (double) (fin - inicio) * 1.0e-9;
-            //System.out.println("El ordenamiento duró " + diff + " segundos");
-            //JOptionPane.showMessageDialog(null, "El ordenamiento duró " + diff + " segundos");
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            // En el finally cerramos el fichero, para asegurarnos
-            // que se cierra tanto si todo va bien como si salta 
-            // una excepcion.
-            try {
-                if (null != fr) {
-                    fr.close();
-                }
-            } catch (Exception e2) {
-                e2.printStackTrace();
-            }
-        }
-    }
-
+    
     public String cargar() throws FileNotFoundException, IOException {
-        
-        String dir;
-        File archivo = null;
-        FileReader fr = null;
-        BufferedReader br = null;
-        
-        dir = JOptionPane.showInputDialog(null, "Paste directory", "Direccion del archivo", 3);
-        archivo = new File(dir);
-        boolean exists = false;
-        if (!archivo.exists()) {
-            JOptionPane.showMessageDialog(null, "La ruta especificada no contiene ningún archivo");
-            while (exists != true) {
-                dir = JOptionPane.showInputDialog(null, "Paste directory", "Direccion del archivo", 3);
-                if (archivo.exists()) {
-                    exists = true;
-                } else {
-                    JOptionPane.showMessageDialog(null, "La ruta especificada no contiene ningún archivo");
-                }
 
-            }
-
+        FileChooser fc = new FileChooser();
+        //JFileChooser fc =  new JFileChooser();
+        fc.setInitialDirectory(new File("C:\\"));
+        FileNameExtensionFilter filtro = new FileNameExtensionFilter("*.TXT", "txt");
+        //fc.setFileFilter(filtro);
+        String dire = "";
+        File seleccion = null;
+        seleccion = fc.showOpenDialog(null);
+        fc.setTitle("Archivo a ordenar");
+        if (seleccion != null) {
+           
+           dire = String.valueOf((String)seleccion.getAbsolutePath());
+            
         }
-        JOptionPane.showMessageDialog(null, "Dirección del archivo: " + dir);
-
-        return dir;
+        
+        return dire;
     }
-   
 
     @FXML
-    private void openButton(ActionEvent event) {
-        
+    private void btn_QuickSort(ActionEvent event) throws IOException {
+        progressBar.setProgress(0.0);
+        progressbar();
+        dir = cargar();
+        ordenar();
+    }
+
+    @FXML
+    private void btn_Seleccion(ActionEvent event) throws IOException {
+        progressBar.setProgress(0.0);
+        progressbar();
+        dir = cargar();
+        ordenar();
+    }
+
+    @FXML
+    private void btn_BubbleSort(ActionEvent event) throws IOException {
+        progressBar.setProgress(0.0);
+        progressbar();
+        dir = cargar();
+        ordenar();
+    }
+
+    @FXML
+    private void btn_Insercion(ActionEvent event) throws IOException {
+        progressBar.setProgress(0.0);
+        progressbar();
+        dir = cargar();
+        ordenar();
+    }
+
+    @FXML
+    private void btn_Fusion(ActionEvent event) throws IOException {
+        progressBar.setProgress(0.0);
+        progressbar();
+        dir = cargar();
+        ordenar();
     }
     
 }
